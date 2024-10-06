@@ -57,19 +57,54 @@ interface RealtimeEvent {
   event: { [key: string]: any };
 }
 
+function useRealtimeClient() {
+  const [client, setClient] = useState<RealtimeClient | null>(null);
+
+  useEffect(() => {
+    /**
+     * Ask user for API Key
+     * If we're using the local relay server, we don't need this
+     */
+    const storedApiKey = LOCAL_RELAY_SERVER_URL
+      ? ''
+      : localStorage.getItem('tmp::voice_api_key') || '';
+    
+    if (storedApiKey !== '') {
+      localStorage.setItem('tmp::voice_api_key', storedApiKey);
+    }
+
+    if (storedApiKey || LOCAL_RELAY_SERVER_URL) {
+      const newClient = new RealtimeClient(
+        LOCAL_RELAY_SERVER_URL
+          ? { url: LOCAL_RELAY_SERVER_URL }
+          : {
+              apiKey: storedApiKey,
+              dangerouslyAllowAPIKeyInBrowser: true,
+            }
+      );
+      setClient(newClient);
+    }
+
+    return () => {
+      if (client) {
+        client.reset();
+      }
+    };
+  }, []);
+
+  const getClient = useCallback(() => {
+    if (!client) {
+      throw new Error('RealtimeClient not initialized');
+    }
+    return client;
+  }, [client]);
+
+  return { getClient, isReady: !!client };
+}
+
 export function Console() {
-  /**
-   * Ask user for API Key
-   * If we're using the local relay server, we don't need this
-   */
-  const apiKey = LOCAL_RELAY_SERVER_URL
-    ? ''
-    : localStorage.getItem('tmp::voice_api_key') ||
-      prompt('OpenAI API Key') ||
-      '';
-  if (apiKey !== '') {
-    localStorage.setItem('tmp::voice_api_key', apiKey);
-  }
+  const { getClient, isReady } = useRealtimeClient();
+  const [apiKey, setApiKey] = useState('');
 
   /**
    * Instantiate:
@@ -82,16 +117,6 @@ export function Console() {
   );
   const wavStreamPlayerRef = useRef<WavStreamPlayer>(
     new WavStreamPlayer({ sampleRate: 24000 })
-  );
-  const clientRef = useRef<RealtimeClient>(
-    new RealtimeClient(
-      LOCAL_RELAY_SERVER_URL
-        ? { url: LOCAL_RELAY_SERVER_URL }
-        : {
-            apiKey: apiKey,
-            dangerouslyAllowAPIKeyInBrowser: true,
-          }
-    )
   );
 
   /**
@@ -153,10 +178,11 @@ export function Console() {
    * When you click the API key
    */
   const resetAPIKey = useCallback(() => {
-    const apiKey = prompt('OpenAI API Key');
-    if (apiKey !== null) {
+    const newApiKey = prompt('OpenAI API Key');
+    if (newApiKey !== null) {
       localStorage.clear();
-      localStorage.setItem('tmp::voice_api_key', apiKey);
+      localStorage.setItem('tmp::voice_api_key', newApiKey);
+      setApiKey(newApiKey);
       window.location.reload();
     }
   }, []);
@@ -166,7 +192,7 @@ export function Console() {
    * WavRecorder taks speech input, WavStreamPlayer output, client is API client
    */
   const connectConversation = useCallback(async () => {
-    const client = clientRef.current;
+    const client = getClient();
     const wavRecorder = wavRecorderRef.current;
     const wavStreamPlayer = wavStreamPlayerRef.current;
 
@@ -195,7 +221,7 @@ export function Console() {
     if (client.getTurnDetectionType() === 'server_vad') {
       await wavRecorder.record((data) => client.appendInputAudio(data.mono));
     }
-  }, []);
+  }, [getClient]);
 
   /**
    * Disconnect and reset conversation state
@@ -211,7 +237,7 @@ export function Console() {
     });
     setMarker(null);
 
-    const client = clientRef.current;
+    const client = getClient();
     client.disconnect();
 
     const wavRecorder = wavRecorderRef.current;
@@ -219,12 +245,12 @@ export function Console() {
 
     const wavStreamPlayer = wavStreamPlayerRef.current;
     await wavStreamPlayer.interrupt();
-  }, []);
+  }, [getClient]);
 
   const deleteConversationItem = useCallback(async (id: string) => {
-    const client = clientRef.current;
+    const client = getClient();
     client.deleteItem(id);
-  }, []);
+  }, [getClient]);
 
   /**
    * In push-to-talk mode, start recording
@@ -232,7 +258,7 @@ export function Console() {
    */
   const startRecording = async () => {
     setIsRecording(true);
-    const client = clientRef.current;
+    const client = getClient();
     const wavRecorder = wavRecorderRef.current;
     const wavStreamPlayer = wavStreamPlayerRef.current;
     const trackSampleOffset = await wavStreamPlayer.interrupt();
@@ -248,7 +274,7 @@ export function Console() {
    */
   const stopRecording = async () => {
     setIsRecording(false);
-    const client = clientRef.current;
+    const client = getClient();
     const wavRecorder = wavRecorderRef.current;
     await wavRecorder.pause();
     client.createResponse();
@@ -258,7 +284,7 @@ export function Console() {
    * Switch between Manual <> VAD mode for communication
    */
   const changeTurnEndType = async (value: string) => {
-    const client = clientRef.current;
+    const client = getClient();
     const wavRecorder = wavRecorderRef.current;
     if (value === 'none' && wavRecorder.getStatus() === 'recording') {
       await wavRecorder.pause();
@@ -376,8 +402,10 @@ export function Console() {
    */
   useEffect(() => {
     // Get refs
+    if (!isReady) return;
+
     const wavStreamPlayer = wavStreamPlayerRef.current;
-    const client = clientRef.current;
+    const client = getClient();
 
     // Set instructions
     client.updateSession({ instructions: instructions });
@@ -501,7 +529,7 @@ export function Console() {
       // cleanup; resets to defaults
       client.reset();
     };
-  }, []);
+  }, [isReady, getClient]);
 
   /**
    * Render the application
@@ -510,11 +538,11 @@ export function Console() {
     <div data-component="Console">
       <div className="content-top">
         <div className="content-title">
-          <img src="/openai-logomark.svg" />
+          <img src="/images/openai-logomark.svg" />
           <span>realtime console</span>
         </div>
         <div className="content-api-key">
-          {!LOCAL_RELAY_SERVER_URL && (
+          {!LOCAL_RELAY_SERVER_URL && apiKey && (
             <Button
               icon={Edit}
               iconPosition="end"
@@ -688,9 +716,8 @@ export function Console() {
               iconPosition={isConnected ? 'end' : 'start'}
               icon={isConnected ? X : Zap}
               buttonStyle={isConnected ? 'regular' : 'action'}
-              onClick={
-                isConnected ? disconnectConversation : connectConversation
-              }
+              onClick={isConnected ? disconnectConversation : connectConversation}
+              disabled={!isReady}
             />
           </div>
         </div>
