@@ -1,0 +1,1 @@
+export const ONCHAINKIT_LINK = 'https://onchainkit.xyz';

@@ -9,7 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@coinbase/onchainkit": "^0.32.0",
     "@openai/realtime-api-beta": "github:openai/openai-realtime-api-beta",
+    "@rainbow-me/rainbowkit": "^2.0.0",
+    "@tanstack/react-query": "^5.0.0",
+    "ethers": "^6.0.0",
     "leaflet": "^1.9.4",
     "next": "14.2.14",
     "react": "^18",
@@ -17,6 +21,9 @@
     "react-feather": "^2.0.10",
     "react-leaflet": "^4.2.1",
     "sass": "^1.79.4",
+    "siwe": "^2.3.2",
+    "viem": "^2.0.0",
+    "wagmi": "^2.0.0",
     "ws": "^8.18.0"
   },
   "devDependencies": {
