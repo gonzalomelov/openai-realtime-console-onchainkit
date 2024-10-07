@@ -102,9 +102,24 @@ function useRealtimeClient() {
   return { getClient, isReady: !!client };
 }
 
+import { useAccount, useBalance, useSendTransaction } from 'wagmi';
+import { parseEther } from 'viem';
+import { getAddress } from '@coinbase/onchainkit/identity';
+import { baseSepolia } from 'viem/chains';
+import LoginButton from '../LoginButton';
+import SignupButton from '../SignupButton';
+import TransactionWrapper from '../TransactionWrapper';
+import WalletWrapper from '../WalletWrapper';
+import OnchainkitSvg from '@/svg/OnchainkitSvg';
+import { ONCHAINKIT_LINK } from '@/links';
+
 export function Console() {
+  const { address } = useAccount();
+  const { data: balance } = useBalance({ address })
+  const { sendTransaction } = useSendTransaction();
   const { getClient, isReady } = useRealtimeClient();
   const [apiKey, setApiKey] = useState('');
+  const [showBalance, setShowBalance] = useState(false);
 
   /**
    * Instantiate:
@@ -187,11 +202,24 @@ export function Console() {
     }
   }, []);
 
+  const reconnectClient = useCallback(async () => {
+    if (!isReady) return;
+    const client = getClient();
+    if (!client.isConnected()) {
+      await client.connect();
+      // Reinitialize any necessary session parameters
+      client.updateSession({ instructions: instructions });
+      client.updateSession({ input_audio_transcription: { model: 'whisper-1' } });
+      // Add any other initialization steps here
+    }
+  }, [isReady, getClient]);
+
   /**
    * Connect to conversation:
    * WavRecorder taks speech input, WavStreamPlayer output, client is API client
    */
   const connectConversation = useCallback(async () => {
+    await reconnectClient();
     const client = getClient();
     const wavRecorder = wavRecorderRef.current;
     const wavStreamPlayer = wavStreamPlayerRef.current;
@@ -208,8 +236,6 @@ export function Console() {
     // Connect to audio output
     await wavStreamPlayer.connect();
 
-    // Connect to realtime API
-    await client.connect();
     client.sendUserMessageContent([
       {
         type: `input_text`,
@@ -221,7 +247,7 @@ export function Console() {
     if (client.getTurnDetectionType() === 'server_vad') {
       await wavRecorder.record((data) => client.appendInputAudio(data.mono));
     }
-  }, [getClient]);
+  }, [getClient, reconnectClient]);
 
   /**
    * Disconnect and reset conversation state
@@ -261,6 +287,19 @@ export function Console() {
     const client = getClient();
     const wavRecorder = wavRecorderRef.current;
     const wavStreamPlayer = wavStreamPlayerRef.current;
+
+    // Attempt to reconnect if not connected
+    if (!client.isConnected()) {
+      try {
+        await reconnectClient();
+      } catch (error) {
+        console.error('Failed to reconnect:', error);
+        setIsRecording(false);
+        // Optionally, show an error message to the user
+        return;
+      }
+    }
+
     const trackSampleOffset = await wavStreamPlayer.interrupt();
     if (trackSampleOffset?.trackId) {
       const { trackId, offset } = trackSampleOffset;
@@ -396,6 +435,18 @@ export function Console() {
     };
   }, []);
 
+  const connectWallet = useCallback(async () => {
+    if (address) {
+      return { message: 'Wallet already connected', address };
+    }
+    const signupButton = document.querySelector('[data-testid="signup-button"] button');
+    if (signupButton instanceof HTMLElement) {
+      signupButton.click();
+      return { message: 'Wallet connection initiated' };
+    }
+    return { message: 'Unable to initiate wallet connection' };
+  }, [address]);
+
   /**
    * Core RealtimeClient and audio capture setup
    * Set all of our instructions, tools, events and more
@@ -485,6 +536,114 @@ export function Console() {
         return json;
       }
     );
+    client.addTool(
+      {
+        name: 'send_eth',
+        description: 'Sends a specified amount of ETH to a given address or Basename.',
+        parameters: {
+          type: 'object',
+          properties: {
+            to: {
+              type: 'string',
+              description: 'The recipient address or Basename (e.g., gonzalomelov.base.eth)',
+            },
+            amount: {
+              type: 'string',
+              description: 'The amount of ETH to send (in ETH, not Wei)',
+            },
+          },
+          required: ['to', 'amount'],
+        },
+      },
+      async ({ to, amount }: { to: string; amount: string }) => {
+        if (!address) {
+          return { error: 'No wallet connected' };
+        }
+
+        try {
+          // Resolve Basename to address
+          let recipientAddress = to;
+          if (to.endsWith('.base.eth')) {
+            const resolvedAddress = await getAddress({ name: to });
+            if (resolvedAddress) {
+              recipientAddress = resolvedAddress;
+            } else {
+              return { error: 'Unable to resolve Basename' };
+            }
+          }
+
+          const amountInWei = parseEther(amount);
+          const transaction = await sendTransaction({
+            to: recipientAddress as `0x${string}`,
+            value: amountInWei,
+            chainId: baseSepolia.id,
+          });
+          
+          return {
+            message: `Transaction sent`, // : ${transaction.hash}
+            // hash: transaction.hash,
+          };
+        } catch (error) {
+          console.error('Error sending transaction:', error);
+          return { error: 'Failed to send transaction' };
+        }
+      }
+    );
+    client.addTool(
+      {
+        name: 'get_account_balance',
+        description: 'Retrieves the current account balance of the connected wallet.',
+        parameters: {
+          type: 'object',
+          properties: {},
+          required: [],
+        },
+      },
+      async () => {
+        if (!address) {
+          return { error: 'No wallet connected' };
+        }
+        if (!balance) {
+          return { error: 'Unable to fetch balance' };
+        }
+        setShowBalance(true); // Set showBalance to true when the tool is called
+        return {
+          address: address,
+          balance: balance.formatted,
+          symbol: balance.symbol,
+        };
+      }
+    );
+    client.addTool(
+      {
+        name: 'hide_account_balance',
+        description: 'Hides the account balance display.',
+        parameters: {
+          type: 'object',
+          properties: {},
+          required: [],
+        },
+      },
+      async () => {
+        setShowBalance(false);
+        return { message: 'Account balance hidden' };
+      }
+    );
+    client.addTool(
+      {
+        name: 'connect_wallet',
+        description: 'Connects or creates a wallet for the user.',
+        parameters: {
+          type: 'object',
+          properties: {},
+          required: [],
+        },
+      },
+      async () => {
+        await connectWallet();
+        return { message: 'Wallet connection initiated' };
+      }
+    );
 
     // handle realtime events from client + server for event logging
     client.on('realtime.event', (realtimeEvent: RealtimeEvent) => {
@@ -529,7 +688,21 @@ export function Console() {
       // cleanup; resets to defaults
       client.reset();
     };
-  }, [isReady, getClient]);
+  }, [isReady, getClient, address, balance, connectWallet]);
+
+  useEffect(() => {
+    const handleFocus = () => {
+      if (isConnected) {
+        reconnectClient().catch(console.error);
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [isConnected, reconnectClient]);
 
   /**
    * Render the application
@@ -722,6 +895,7 @@ export function Console() {
           </div>
         </div>
         <div className="content-right">
+          {/*
           <div className="content-block map">
             <div className="content-block-title">get_weather()</div>
             <div className="content-block-title bottom">
@@ -748,6 +922,56 @@ export function Console() {
               )}
             </div>
           </div>
+          */}
+          
+          <div className="content-block onchain">
+            <div className="content-block-title">OnchainKit</div>
+            <div className="content-block-body full">
+              <div className="flex flex-col w-full h-full">
+                <section className="mb-4 flex w-full flex-row items-center justify-between">
+                  <a
+                    href={ONCHAINKIT_LINK}
+                    title="onchainkit"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <OnchainkitSvg />
+                  </a>
+                  <div className="flex items-center gap-3">
+                    <SignupButton />
+                    {!address && <LoginButton />}
+                    {/* <Button
+                      label="Test Connect Wallet"
+                      onClick={connectWallet}
+                    /> */}
+                  </div>
+                </section>
+                <section className="flex grow flex-col items-center justify-center gap-4 rounded-xl bg-gray-100 p-4">
+                  <div className="flex h-[200px] w-full items-center justify-center rounded-xl bg-[#030712]">
+                    <div className="rounded-xl bg-[#F3F4F6] px-4 py-[11px]">
+                      <p className="font-normal text-indigo-600 text-sm not-italic tracking-[-0.6px]">
+                        npm install @coinbase/onchainkit
+                      </p>
+                    </div>
+                  </div>
+                  {address ? (
+                    <TransactionWrapper address={address} />
+                  ) : (
+                    <WalletWrapper
+                      className="w-full"
+                      text="Sign in to transact"
+                    />
+                  )}
+                  {showBalance && balance && (
+                    <div className="text-sm">
+                      Balance: {balance.formatted} {balance.symbol}
+                    </div>
+                  )}
+                </section>
+              </div>
+            </div>
+          </div>
+          
           <div className="content-block kv">
             <div className="content-block-title">set_memory()</div>
             <div className="content-block-body content-kv">
