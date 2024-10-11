@@ -729,14 +729,14 @@ export function Console() {
       <div className="content-main">
         <div className="content-logs">
           <div className="content-block events">
-            <div className="visualization">
+            {/* <div className="visualization">
               <div className="visualization-entry client">
                 <canvas ref={clientCanvasRef} />
               </div>
               <div className="visualization-entry server">
                 <canvas ref={serverCanvasRef} />
               </div>
-            </div>
+            </div> */}
             <div className="content-block-title">events</div>
             <div className="content-block-body" ref={eventsScrollRef}>
               {!realtimeEvents.length && `awaiting connection...`}
@@ -924,7 +924,7 @@ export function Console() {
           </div>
           */}
           
-          <div className="content-block onchain">
+          <div className="content-block onchain" style={{ display: 'none' }}>
             <div className="content-block-title">OnchainKit</div>
             <div className="content-block-body full">
               <div className="flex flex-col w-full h-full">
@@ -940,10 +940,6 @@ export function Console() {
                   <div className="flex items-center gap-3">
                     <SignupButton />
                     {!address && <LoginButton />}
-                    {/* <Button
-                      label="Test Connect Wallet"
-                      onClick={connectWallet}
-                    /> */}
                   </div>
                 </section>
                 <section className="flex grow flex-col items-center justify-center gap-4 rounded-xl bg-gray-100 p-4">
@@ -968,6 +964,20 @@ export function Console() {
                     </div>
                   )}
                 </section>
+              </div>
+            </div>
+          </div>
+
+          <div className="content-block waveform">
+            <div className="content-block-title">Visualization</div>
+            <div className="content-block-body full">
+              <div className="visualization">
+                <div className="visualization-entry client">
+                  <canvas ref={clientCanvasRef} />
+                </div>
+                <div className="visualization-entry server">
+                  <canvas ref={serverCanvasRef} />
+                </div>
               </div>
             </div>
           </div>

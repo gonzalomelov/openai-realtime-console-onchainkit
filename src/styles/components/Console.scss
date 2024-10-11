@@ -110,6 +110,16 @@
           margin-top: 56px;
         }
       }
+      & > div.waveform {
+        height: 300px; // Adjust this value as needed
+        background-color: #f5f5f5; // Light background for contrast
+        .content-block-body {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100%;
+        }
+      }
     }
     .content-logs {
       flex-grow: 1;
@@ -249,21 +259,14 @@
   }
 
   .visualization {
-    position: absolute;
     display: flex;
-    bottom: 4px;
-    right: 8px;
-    padding: 4px;
-    border-radius: 16px;
-    z-index: 10;
-    gap: 2px;
+    gap: 16px;
     .visualization-entry {
       position: relative;
       display: flex;
       align-items: center;
-      height: 40px;
-      width: 100px;
-      gap: 4px;
+      height: 200px; // Increased height
+      width: 300px; // Increased width
       &.client {
         color: #0099ff;
       }
