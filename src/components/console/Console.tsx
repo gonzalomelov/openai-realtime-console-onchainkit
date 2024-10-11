@@ -140,8 +140,7 @@ export function Console() {
    * - Autoscrolling event logs
    * - Timing delta for event log displays
    */
-  const clientCanvasRef = useRef<HTMLCanvasElement>(null);
-  const serverCanvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const eventsScrollHeightRef = useRef(0);
   const eventsScrollRef = useRef<HTMLDivElement>(null);
   const startTimeRef = useRef<string>(new Date().toISOString());
@@ -372,58 +371,47 @@ export function Console() {
     let isLoaded = true;
 
     const wavRecorder = wavRecorderRef.current;
-    const clientCanvas = clientCanvasRef.current;
-    let clientCtx: CanvasRenderingContext2D | null = null;
-
     const wavStreamPlayer = wavStreamPlayerRef.current;
-    const serverCanvas = serverCanvasRef.current;
-    let serverCtx: CanvasRenderingContext2D | null = null;
+    const canvas = canvasRef.current;
+    let ctx: CanvasRenderingContext2D | null = null;
 
     const render = () => {
-      if (isLoaded) {
-        if (clientCanvas) {
-          if (!clientCanvas.width || !clientCanvas.height) {
-            clientCanvas.width = clientCanvas.offsetWidth;
-            clientCanvas.height = clientCanvas.offsetHeight;
-          }
-          clientCtx = clientCtx || clientCanvas.getContext('2d');
-          if (clientCtx) {
-            clientCtx.clearRect(0, 0, clientCanvas.width, clientCanvas.height);
-            const result = wavRecorder.recording
-              ? wavRecorder.getFrequencies('voice')
-              : { values: new Float32Array([0]) };
-            WavRenderer.drawBars(
-              clientCanvas,
-              clientCtx,
-              result.values,
-              '#0099ff',
-              10,
-              0,
-              8
-            );
-          }
+      if (isLoaded && canvas) {
+        if (!canvas.width || !canvas.height) {
+          canvas.width = canvas.offsetWidth;
+          canvas.height = canvas.offsetHeight;
         }
-        if (serverCanvas) {
-          if (!serverCanvas.width || !serverCanvas.height) {
-            serverCanvas.width = serverCanvas.offsetWidth;
-            serverCanvas.height = serverCanvas.offsetHeight;
-          }
-          serverCtx = serverCtx || serverCanvas.getContext('2d');
-          if (serverCtx) {
-            serverCtx.clearRect(0, 0, serverCanvas.width, serverCanvas.height);
-            const result = wavStreamPlayer.analyser
-              ? wavStreamPlayer.getFrequencies('voice')
-              : { values: new Float32Array([0]) };
-            WavRenderer.drawBars(
-              serverCanvas,
-              serverCtx,
-              result.values,
-              '#009900',
-              10,
-              0,
-              8
-            );
-          }
+        ctx = ctx || canvas.getContext('2d');
+        if (ctx) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          // Render client visualization
+          const clientResult = wavRecorder.recording
+            ? wavRecorder.getFrequencies('voice')
+            : { values: new Float32Array([0]) };
+          WavRenderer.drawBars(
+            canvas,
+            ctx,
+            clientResult.values,
+            '#0099ff',
+            10,
+            0,
+            4
+          );
+
+          // Render server visualization
+          const serverResult = wavStreamPlayer.analyser
+            ? wavStreamPlayer.getFrequencies('voice')
+            : { values: new Float32Array([0]) };
+          WavRenderer.drawBars(
+            canvas,
+            ctx,
+            serverResult.values,
+            '#009900',
+            10,
+            0,
+            4
+          );
         }
         window.requestAnimationFrame(render);
       }
@@ -972,11 +960,8 @@ export function Console() {
             <div className="content-block-title">Visualization</div>
             <div className="content-block-body full">
               <div className="visualization">
-                <div className="visualization-entry client">
-                  <canvas ref={clientCanvasRef} />
-                </div>
-                <div className="visualization-entry server">
-                  <canvas ref={serverCanvasRef} />
+                <div className="visualization-entry">
+                  <canvas ref={canvasRef} />
                 </div>
               </div>
             </div>

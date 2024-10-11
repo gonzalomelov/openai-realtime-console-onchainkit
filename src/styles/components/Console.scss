@@ -267,12 +267,6 @@
       align-items: center;
       height: 200px; // Increased height
       width: 300px; // Increased width
-      &.client {
-        color: #0099ff;
-      }
-      &.server {
-        color: #009900;
-      }
       canvas {
         width: 100%;
         height: 100%;
