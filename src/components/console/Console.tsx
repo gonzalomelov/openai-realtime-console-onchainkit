@@ -102,7 +102,7 @@ function useRealtimeClient() {
   return { getClient, isReady: !!client };
 }
 
-import { useAccount, useBalance, useSendTransaction } from 'wagmi';
+import { useAccount, useBalance, useSendTransaction, useDisconnect } from 'wagmi';
 import { parseEther } from 'viem';
 import { getAddress } from '@coinbase/onchainkit/identity';
 import { baseSepolia } from 'viem/chains';
@@ -115,8 +115,9 @@ import { ONCHAINKIT_LINK } from '@/links';
 
 export function Console() {
   const { address } = useAccount();
-  const { data: balance } = useBalance({ address })
+  const { data: balance } = useBalance({ address });
   const { sendTransaction } = useSendTransaction();
+  const { disconnect } = useDisconnect();
   const { getClient, isReady } = useRealtimeClient();
   const [apiKey, setApiKey] = useState('');
   const [showBalance, setShowBalance] = useState(false);
@@ -438,6 +439,14 @@ export function Console() {
     return { message: 'Unable to initiate wallet connection' };
   }, [address]);
 
+  const disconnectWallet = useCallback(async () => {
+    if (!address) {
+      return { message: 'No wallet connected' };
+    }
+    disconnect();
+    return { message: 'Wallet disconnected' };
+  }, [address, disconnect]);
+
   /**
    * Core RealtimeClient and audio capture setup
    * Set all of our instructions, tools, events and more
@@ -635,6 +644,21 @@ export function Console() {
         return { message: 'Wallet connection initiated' };
       }
     );
+    client.addTool(
+      {
+        name: 'disconnect_wallet',
+        description: 'Disconnects the currently connected wallet.',
+        parameters: {
+          type: 'object',
+          properties: {},
+          required: [],
+        },
+      },
+      async () => {
+        await disconnectWallet();
+        return { message: 'Wallet disconnected' };
+      }
+    );
 
     // handle realtime events from client + server for event logging
     client.on('realtime.event', (realtimeEvent: RealtimeEvent) => {
@@ -691,7 +715,7 @@ export function Console() {
       // cleanup; resets to defaults
       client.reset();
     };
-  }, [isReady, getClient, address, balance, connectWallet]);
+  }, [isReady, getClient, address, balance, connectWallet, disconnectWallet]);
 
   useEffect(() => {
     const handleFocus = () => {
@@ -927,7 +951,7 @@ export function Console() {
           </div>
           */}
           
-          <div className="content-block onchain" style={{ display: 'none' }}>
+          <div className="content-block onchain">
             <div className="content-block-title">OnchainKit</div>
             <div className="content-block-body full">
               <div className="flex flex-col w-full h-full">
@@ -971,7 +995,7 @@ export function Console() {
             </div>
           </div>
 
-          <div className="content-block waveform">
+          <div className="content-block waveform" style={{ display: 'none' }}>
             <div className="content-block-title">Visualization</div>
             <div className="content-block-body full">
               <div className="last-assistant-message">{lastAssistantMessage}</div>
