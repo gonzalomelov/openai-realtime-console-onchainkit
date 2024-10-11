@@ -167,6 +167,9 @@ export function Console() {
   });
   const [marker, setMarker] = useState<Coordinates | null>(null);
 
+  const [lastAssistantMessage, setLastAssistantMessage] = useState<string>('');
+  const [lastUserMessage, setLastUserMessage] = useState<string>('');
+
   /**
    * Utility for formatting the timing of logs
    */
@@ -668,6 +671,18 @@ export function Console() {
         item.formatted.file = wavFile;
       }
       setItems(items);
+
+      // Update last messages
+      const assistantMessages = items.filter(i => i.role === 'assistant');
+      const userMessages = items.filter(i => i.role === 'user');
+      if (assistantMessages.length > 0) {
+        const lastAssistantItem = assistantMessages[assistantMessages.length - 1];
+        setLastAssistantMessage(lastAssistantItem.formatted.transcript || lastAssistantItem.formatted.text || '');
+      }
+      if (userMessages.length > 0) {
+        const lastUserItem = userMessages[userMessages.length - 1];
+        setLastUserMessage(lastUserItem.formatted.transcript || lastUserItem.formatted.text || '');
+      }
     });
 
     setItems(client.conversation.getItems());
@@ -959,11 +974,13 @@ export function Console() {
           <div className="content-block waveform">
             <div className="content-block-title">Visualization</div>
             <div className="content-block-body full">
+              <div className="last-assistant-message">{lastAssistantMessage}</div>
               <div className="visualization">
                 <div className="visualization-entry">
                   <canvas ref={canvasRef} />
                 </div>
               </div>
+              <div className="last-user-message">{lastUserMessage}</div>
             </div>
           </div>
           
