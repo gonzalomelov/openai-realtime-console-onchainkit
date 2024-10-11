@@ -31,7 +31,7 @@ export function useWagmiConfig() {
         },
       ],
       {
-        appName: 'OpenAI Realtime Console',
+        appName: 'OpenAI Realtime Console with OnchainKit',
         projectId,
       },
     );

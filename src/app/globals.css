@@ -4,13 +4,13 @@
 
 :root {
   /* Palette */
-  --palette-bg-black: #fff;
-  --palette-bg-white: rgb(21, 26, 38);
+  --palette-bg-black: #0A0B0D;
+  --palette-bg-white: #fff;
 
   /* Indicates that the element can be rendered using 
    * the operating system dark color scheme. 
    * https://developer.mozilla.org/en-US/docs/Web/CSS/color-scheme */
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 *,
@@ -30,7 +30,8 @@ body {
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
-  color: #18181b;
+  color: #ffffff;
+  background-color: #0A0B0D;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

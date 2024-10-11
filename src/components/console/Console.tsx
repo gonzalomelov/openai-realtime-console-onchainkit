@@ -168,8 +168,8 @@ export function Console() {
   });
   const [marker, setMarker] = useState<Coordinates | null>(null);
 
-  const [lastAssistantMessage, setLastAssistantMessage] = useState<string>('');
-  const [lastUserMessage, setLastUserMessage] = useState<string>('');
+  const [lastAssistantMessage, setLastAssistantMessage] = useState<string>('...');
+  const [lastUserMessage, setLastUserMessage] = useState<string>('...');
 
   /**
    * Utility for formatting the timing of logs
@@ -738,8 +738,8 @@ export function Console() {
     <div data-component="Console">
       <div className="content-top">
         <div className="content-title">
-          <img src="/images/openai-logomark.svg" />
-          <span>realtime console</span>
+          {/* <img src="/images/openai-logomark.svg" />
+          <span>realtime console</span> */}
         </div>
         <div className="content-api-key">
           {!LOCAL_RELAY_SERVER_URL && apiKey && (
@@ -754,8 +754,8 @@ export function Console() {
         </div>
       </div>
       <div className="content-main">
-        <div className="content-logs">
-          <div className="content-block events">
+        <div className="content-logs" >
+          <div className="content-block events" style={{ display: 'none' }}>
             {/* <div className="visualization">
               <div className="visualization-entry client">
                 <canvas ref={clientCanvasRef} />
@@ -829,7 +829,7 @@ export function Console() {
               })}
             </div>
           </div>
-          <div className="content-block conversation">
+          <div className="content-block conversation" style={{ display: 'none' }}>
             <div className="content-block-title">conversation</div>
             <div className="content-block-body" data-conversation-content>
               {!items.length && `awaiting connection...`}
@@ -893,31 +893,25 @@ export function Console() {
               })}
             </div>
           </div>
-          <div className="content-actions">
-            <Toggle
-              defaultValue={false}
-              labels={['manual', 'vad']}
-              values={['none', 'server_vad']}
-              onChange={(_, value) => changeTurnEndType(value)}
-            />
-            <div className="spacer" />
+          <div className="content-actions flex flex-col items-center justify-center flex-grow">
             {isConnected && canPushToTalk && (
               <Button
-                label={isRecording ? 'release to send' : 'push to talk'}
+                label={isRecording ? 'Release to send' : 'Push to talk'}
                 buttonStyle={isRecording ? 'alert' : 'regular'}
                 disabled={!isConnected || !canPushToTalk}
                 onMouseDown={startRecording}
                 onMouseUp={stopRecording}
+                className={`mb-4 ${isRecording ? 'large-button' : 'large-button-blue'}`}
               />
             )}
-            <div className="spacer" />
             <Button
-              label={isConnected ? 'disconnect' : 'connect'}
+              label={isConnected ? 'Disconnect' : 'Connect'}
               iconPosition={isConnected ? 'end' : 'start'}
               icon={isConnected ? X : Zap}
               buttonStyle={isConnected ? 'regular' : 'action'}
               onClick={isConnected ? disconnectConversation : connectConversation}
               disabled={!isReady}
+              className={isConnected ? "large-button" : "large-button-blue"}
             />
           </div>
         </div>
@@ -951,7 +945,7 @@ export function Console() {
           </div>
           */}
           
-          <div className="content-block onchain">
+          <div className="content-block onchain" style={{ display: 'none' }}>
             <div className="content-block-title">OnchainKit</div>
             <div className="content-block-body full">
               <div className="flex flex-col w-full h-full">
@@ -995,8 +989,8 @@ export function Console() {
             </div>
           </div>
 
-          <div className="content-block waveform" style={{ display: 'none' }}>
-            <div className="content-block-title">Visualization</div>
+          <div className="content-block waveform">
+            <div className="content-block-title">Assistant</div>
             <div className="content-block-body full">
               <div className="last-assistant-message">{lastAssistantMessage}</div>
               <div className="visualization">
@@ -1008,7 +1002,7 @@ export function Console() {
             </div>
           </div>
           
-          <div className="content-block kv">
+          <div className="content-block kv" style={{ display: 'none' }}>
             <div className="content-block-title">set_memory()</div>
             <div className="content-block-body content-kv">
               {JSON.stringify(memoryKv, null, 2)}

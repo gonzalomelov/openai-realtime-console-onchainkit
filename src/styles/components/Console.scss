@@ -8,6 +8,8 @@
   flex-direction: column;
   overflow: hidden;
   margin: 0px 8px;
+  background-color: #0A0B0D;
+  color: #ffffff;
   & > div {
     flex-shrink: 0;
   }
@@ -79,6 +81,7 @@
         overflow: hidden;
         position: relative;
         .content-block-title {
+          color: #0A0B0D;
           position: absolute;
           display: flex;
           align-items: center;
@@ -139,11 +142,11 @@
         }
 
         .last-assistant-message {
-          color: #009900;
+          color: #0A0B0D;
         }
 
         .last-user-message {
-          color: #0099ff;
+          color: #0A0B0D;
         }
 
         .visualization {
@@ -170,16 +173,21 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      justify-content: center; // Center vertically
+      align-items: center; // Center horizontally
       & > div {
         flex-grow: 1;
       }
       & > .content-actions {
-        flex-grow: 0;
+        flex-grow: 1; // Allow it to take up available space
         flex-shrink: 0;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         gap: 16px;
+        padding: 16px 0;
+        width: 100%; // Ensure full width
       }
       & > div.events {
         overflow: hidden;
@@ -235,14 +243,14 @@
       flex-shrink: 0;
       margin-right: 16px;
       &.user {
-        color: #0099ff;
+        color: #0A0B0D;
       }
       &.assistant {
-        color: #009900;
+        color: #0A0B0D;
       }
     }
     .speaker-content {
-      color: #18181b;
+      color: #0A0B0D;
       overflow: hidden;
       word-wrap: break-word;
     }
@@ -265,7 +273,7 @@
     .event-details {
       display: flex;
       flex-direction: column;
-      color: #18181b;
+      color: #0A0B0D;
       gap: 8px;
       .event-summary {
         padding: 4px 8px;
@@ -309,12 +317,86 @@
       position: relative;
       display: flex;
       align-items: center;
-      height: 200px; // Increased height
-      width: 300px; // Increased width
+      height: 200px;
+      width: 300px;
       canvas {
         width: 100%;
         height: 100%;
         color: currentColor;
+      }
+    }
+  }
+
+  .content-main {
+    .content-logs {
+      & > .content-actions {
+        .large-button {
+          font-size: 16px;
+          padding: 12px 24px;
+          min-width: 200px;
+          height: auto;
+          transition: all 0.3s ease;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+
+          &:hover {
+            transform: scale(1.05);
+          }
+
+          &:disabled {
+            cursor: not-allowed;
+          }
+        }
+
+        .large-button-blue {
+          font-size: 16px;
+          padding: 12px 24px;
+          min-width: 200px;
+          height: auto;
+          transition: all 0.3s ease;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+          background-color: #0052FF;
+          color: var(--palette-bg-white);
+
+          &:hover {
+            transform: scale(1.05);
+            background-color: #0045d6;
+          }
+
+          &:disabled {
+            cursor: not-allowed;
+            background-color: #7fa5ff;
+          }
+        }
+
+        .large-button-blue {
+          font-size: 20px;
+          padding: 12px 24px;
+          min-width: 260px;
+          height: auto;
+          transition: all 0.3s ease;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+          background-color: #0052FF;
+          color: var(--palette-bg-white);
+
+          &:hover {
+            transform: scale(1.05);
+            background-color: #0045d6;
+          }
+
+          &:disabled {
+            cursor: not-allowed;
+            background-color: #7fa5ff;
+          }
+        }
       }
     }
   }
