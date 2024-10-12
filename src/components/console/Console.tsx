@@ -811,10 +811,10 @@ export function Console() {
           </div>
           
           <div className="smart-wallet-info">
-            <h2 className="text-sm font-semibold mb-2">🗣️ SMART WALLET</h2>
-            <h1 className="text-4xl font-bold mb-4">Tu Voz, Tu Poder</h1>
+            <h2 className="text-sm font-semibold mb-2">TALK2 SMART WALLET</h2>
+            <h1 className="text-4xl font-bold mb-4">Your Voice, Your Power</h1>
             <p className="text-xl mb-6">
-            Controla y maneja tus cryptomonedas de forma inteligente y rápida.
+            Control and manage your cryptocurrencies in a smart and fast way.
             </p>
           </div>
           
@@ -959,7 +959,7 @@ export function Console() {
           <div className="content-actions flex flex-col items-center justify-center flex-grow">
             {isConnected && canPushToTalk && (
               <Button
-                label={isRecording ? 'Suelta para enviar' : 'Presiona para hablar'}
+                label={isRecording ? 'Release to send' : 'Press to speak'}
                 buttonStyle={isRecording ? 'alert' : 'regular'}
                 disabled={!isConnected || !canPushToTalk}
                 onMouseDown={startRecording}
@@ -968,7 +968,7 @@ export function Console() {
               />
             )}
             <Button
-              label={isConnected ? 'Desconectar' : 'Conectar'}
+              label={isConnected ? 'Disconnect' : 'Connect'}
               iconPosition={isConnected ? 'end' : 'start'}
               icon={isConnected ? X : Zap}
               buttonStyle={isConnected ? 'regular' : 'action'}
@@ -1062,7 +1062,7 @@ export function Console() {
           </div>
 
           <div className="content-block waveform">
-            <div className="content-block-title">Asistente</div>
+            <div className="content-block-title">Assistant</div>
             <div className="content-block-body full">
               <div className="last-assistant-message">{lastAssistantMessage}</div>
               <div className="visualization">
