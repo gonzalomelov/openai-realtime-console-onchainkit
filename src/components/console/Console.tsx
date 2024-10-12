@@ -811,7 +811,8 @@ export function Console() {
           </div>
           
           <div className="smart-wallet-info">
-            <h2 className="text-sm font-semibold mb-2">TALK2 SMART WALLET</h2>
+            <h2 className="text-sm font-semibold">TALK2 🗣️</h2>
+            <h2 className="text-sm font-semibold mb-2">SMART WALLET</h2>
             <h1 className="text-4xl font-bold mb-4">Your Voice, Your Power</h1>
             <p className="text-xl mb-6">
             Control and manage your cryptocurrencies in a smart and fast way.
