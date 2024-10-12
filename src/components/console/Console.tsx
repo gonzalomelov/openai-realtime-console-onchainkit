@@ -915,7 +915,7 @@ export function Console() {
           <div className="content-actions flex flex-col items-center justify-center flex-grow">
             {isConnected && canPushToTalk && (
               <Button
-                label={isRecording ? 'Release to send' : 'Push to talk'}
+                label={isRecording ? 'Suelta para enviar' : 'Presiona para hablar'}
                 buttonStyle={isRecording ? 'alert' : 'regular'}
                 disabled={!isConnected || !canPushToTalk}
                 onMouseDown={startRecording}
@@ -924,7 +924,7 @@ export function Console() {
               />
             )}
             <Button
-              label={isConnected ? 'Disconnect' : 'Connect'}
+              label={isConnected ? 'Desconectar' : 'Conectar'}
               iconPosition={isConnected ? 'end' : 'start'}
               icon={isConnected ? X : Zap}
               buttonStyle={isConnected ? 'regular' : 'action'}
