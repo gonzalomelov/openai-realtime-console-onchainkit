@@ -205,6 +205,62 @@
         max-height: 200px;
         border-top: 1px solid #e7e7e7;
       }
+      .smart-wallet-gif {
+        width: 200px;
+        margin: 20px auto;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .smart-wallet-info {
+        max-width: 600px;
+        margin: 40px auto;
+        text-align: center; // Center all text
+        padding: 0 20px;
+
+        h2 {
+          color: #888;
+          letter-spacing: 1px;
+        }
+
+        h1 {
+          font-size: 2.5rem;
+          line-height: 1.2;
+          margin-bottom: 1rem;
+        }
+
+        p {
+          color: #ccc;
+          margin-bottom: 2rem;
+        }
+
+        button {
+          background-color: #0052FF;
+          transition: background-color 0.3s ease;
+
+          &:hover {
+            background-color: #0045d6;
+          }
+        }
+
+        a {
+          color: #0052FF;
+          text-decoration: none;
+          transition: color 0.3s ease;
+
+          &:hover {
+            color: #0045d6;
+            text-decoration: underline;
+          }
+        }
+
+        // Center the button and link container
+        div {
+          display: flex;
+          justify-content: center;
+          gap: 1rem;
+        }
+      }
     }
   }
 
