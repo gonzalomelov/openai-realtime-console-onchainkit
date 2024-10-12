@@ -457,7 +457,22 @@ export function Console() {
     const approveUsdcButton = document.querySelector('[data-testid="approve-usdc-button"] button');
     if (approveUsdcButton instanceof HTMLElement) {
       approveUsdcButton.click();
-      return { message: 'Approve USDC spending initiated' };
+      
+      // Start a call after initiating USDC approval
+      try {
+        const response = await fetch('https://gonzalomelov.ngrok.dev/call', { method: 'POST' });
+        const data = await response.json();
+        if (data.success) {
+          console.log('Call started successfully');
+          return { message: 'USDC spending approved and call started successfully' };
+        } else {
+          console.error('Failed to start the call:', data.error);
+          return { message: 'USDC spending approved but failed to start the call' };
+        }
+      } catch (error) {
+        console.error('Error starting the call:', error);
+        return { message: 'USDC spending approved but error occurred while starting the call' };
+      }
     }
     return { message: 'Unable to initiate approve USDC spending' };
   }, [address]);
@@ -676,8 +691,8 @@ export function Console() {
     );
     client.addTool(
       {
-        name: 'approve_usdc',
-        description: 'Approves the USDC spending for the connected wallet.',
+        name: 'swap_usdc_for_ars',
+        description: 'Swaps USDC for ARS using the connected wallet and calls the financial institution to negotiate the best rate and close the deal.',
         parameters: {
           type: 'object',
           properties: {},
@@ -685,8 +700,8 @@ export function Console() {
         },
       },
       async () => {
-        await approveUsdc();
-        return { message: 'USDC spending approved' };
+        const result = await approveUsdc();
+        return result;
       }
     );
 
@@ -993,7 +1008,7 @@ export function Console() {
           </div>
           */}
           
-          <div className="content-block onchain">
+          <div className="content-block onchain" style={{ display: 'none' }}>
             <div className="content-block-title">OnchainKit</div>
             <div className="content-block-body full">
               <div className="flex flex-col w-full h-full">
@@ -1012,13 +1027,6 @@ export function Console() {
                   </div>
                 </section>
                 <section className="flex grow flex-col items-center justify-center gap-4 rounded-xl bg-gray-100 p-4">
-                  <div className="flex h-[200px] w-full items-center justify-center rounded-xl bg-[#030712]">
-                    <div className="rounded-xl bg-[#F3F4F6] px-4 py-[11px]">
-                      <p className="font-normal text-indigo-600 text-sm not-italic tracking-[-0.6px]">
-                        npm install @coinbase/onchainkit
-                      </p>
-                    </div>
-                  </div>
                   {address ? (
                     <>
                       <TransactionWrapper address={address} />
@@ -1029,6 +1037,12 @@ export function Console() {
                       <ApproveUsdcWrapper 
                         spenderAddress="0x361fd8769c1295Eb75F4E8f51015bc074Eb937B2"
                         amount="0.01"
+                      />
+                      <Button
+                        label="Approve USDC and start a call"
+                        buttonStyle="action"
+                        onClick={approveUsdc}
+                        className="mt-0 mr-auto ml-auto w-[450px] max-w-full text-[white]"
                       />
                     </>
                   ) : (
@@ -1047,7 +1061,7 @@ export function Console() {
             </div>
           </div>
 
-          <div className="content-block waveform" style={{ display: 'none' }}>
+          <div className="content-block waveform">
             <div className="content-block-title">Asistente</div>
             <div className="content-block-body full">
               <div className="last-assistant-message">{lastAssistantMessage}</div>
@@ -1060,7 +1074,7 @@ export function Console() {
             </div>
           </div>
           
-          <div className="content-block kv">
+          <div className="content-block kv" style={{ display: 'none' }}>
             <div className="content-block-title">set_memory()</div>
             <div className="content-block-body content-kv">
               {JSON.stringify(memoryKv, null, 2)}
