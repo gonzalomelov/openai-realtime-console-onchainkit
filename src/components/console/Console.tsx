@@ -113,6 +113,8 @@ import TransactionWrapper from '../TransactionWrapper';
 import WalletWrapper from '../WalletWrapper';
 import OnchainkitSvg from '@/svg/OnchainkitSvg';
 import { ONCHAINKIT_LINK } from '@/links';
+import TransferUsdcWrapper from '../TransferUsdcWrapper';
+import ApproveUsdcWrapper from '../ApproveUsdcWrapper';
 
 export function Console() {
   const { address } = useAccount();
@@ -448,6 +450,18 @@ export function Console() {
     return { message: 'Wallet disconnected' };
   }, [address, disconnect]);
 
+  const approveUsdc = useCallback(async () => {
+    if (!address) {
+      return { message: 'No wallet connected' };
+    }
+    const approveUsdcButton = document.querySelector('[data-testid="approve-usdc-button"] button');
+    if (approveUsdcButton instanceof HTMLElement) {
+      approveUsdcButton.click();
+      return { message: 'Approve USDC spending initiated' };
+    }
+    return { message: 'Unable to initiate approve USDC spending' };
+  }, [address]);
+
   /**
    * Core RealtimeClient and audio capture setup
    * Set all of our instructions, tools, events and more
@@ -660,6 +674,21 @@ export function Console() {
         return { message: 'Wallet disconnected' };
       }
     );
+    client.addTool(
+      {
+        name: 'approve_usdc',
+        description: 'Approves the USDC spending for the connected wallet.',
+        parameters: {
+          type: 'object',
+          properties: {},
+          required: [],
+        },
+      },
+      async () => {
+        await approveUsdc();
+        return { message: 'USDC spending approved' };
+      }
+    );
 
     // handle realtime events from client + server for event logging
     client.on('realtime.event', (realtimeEvent: RealtimeEvent) => {
@@ -716,7 +745,7 @@ export function Console() {
       // cleanup; resets to defaults
       client.reset();
     };
-  }, [isReady, getClient, address, balance, connectWallet, disconnectWallet]);
+  }, [isReady, getClient, address, balance, connectWallet, disconnectWallet, approveUsdc]);
 
   useEffect(() => {
     const handleFocus = () => {
@@ -964,7 +993,7 @@ export function Console() {
           </div>
           */}
           
-          <div className="content-block onchain" style={{ display: 'none' }}>
+          <div className="content-block onchain">
             <div className="content-block-title">OnchainKit</div>
             <div className="content-block-body full">
               <div className="flex flex-col w-full h-full">
@@ -991,7 +1020,17 @@ export function Console() {
                     </div>
                   </div>
                   {address ? (
-                    <TransactionWrapper address={address} />
+                    <>
+                      <TransactionWrapper address={address} />
+                      <TransferUsdcWrapper 
+                        recipientAddress="0x361fd8769c1295Eb75F4E8f51015bc074Eb937B2"
+                        amount="0.01"
+                      />
+                      <ApproveUsdcWrapper 
+                        spenderAddress="0x361fd8769c1295Eb75F4E8f51015bc074Eb937B2"
+                        amount="0.01"
+                      />
+                    </>
                   ) : (
                     <WalletWrapper
                       className="w-full"
@@ -1008,7 +1047,7 @@ export function Console() {
             </div>
           </div>
 
-          <div className="content-block waveform">
+          <div className="content-block waveform" style={{ display: 'none' }}>
             <div className="content-block-title">Asistente</div>
             <div className="content-block-body full">
               <div className="last-assistant-message">{lastAssistantMessage}</div>
@@ -1021,7 +1060,7 @@ export function Console() {
             </div>
           </div>
           
-          <div className="content-block kv" style={{ display: 'none' }}>
+          <div className="content-block kv">
             <div className="content-block-title">set_memory()</div>
             <div className="content-block-body content-kv">
               {JSON.stringify(memoryKv, null, 2)}
