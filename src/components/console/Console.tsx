@@ -887,7 +887,7 @@ export function Console() {
           )}
 
           <div className={`content-block waveform`} style={{ display: isConnected ? 'block' : 'none' }}>
-            <div className="content-block-title">Assistant</div>
+            {/* <div className="content-block-title">Assistant</div> */}
             <div className="content-block-body full flex flex-col items-center">
               <div 
                 className="last-assistant-message w-full"
