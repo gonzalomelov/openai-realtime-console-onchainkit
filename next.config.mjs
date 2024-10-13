@@ -1,3 +1,5 @@
+import withPWA from 'next-pwa';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -17,10 +19,22 @@ const nextConfig = {
             key: 'Cross-Origin-Opener-Policy',
             value: 'same-origin-allow-popups',
           },
+          {
+            key: 'Cross-Origin-Embedder-Policy',
+            value: 'unsafe-none',
+          },
+          {
+            key: 'Cross-Origin-Resource-Policy',
+            value: 'cross-origin',
+          },
         ],
       },
     ];
   },
 };
 
-export default nextConfig;
+export default withPWA({
+  dest: 'public',
+  register: true,
+  skipWaiting: true,
+})(nextConfig);

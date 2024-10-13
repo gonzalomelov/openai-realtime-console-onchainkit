@@ -16,6 +16,9 @@ const OnchainProviders = dynamic(
 export const metadata: Metadata = {
   title: 'OpenAI Realtime Console with OnchainKit',
   description: 'OpenAI Realtime Console integrated with OnchainKit',
+  manifest: '/manifest.json',
+  themeColor: '#000000',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
   openGraph: {
     title: 'OpenAI Realtime Console with OnchainKit',
     description: 'OpenAI Realtime Console integrated with OnchainKit',
@@ -31,6 +34,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <link rel="apple-touch-icon" href="/images/icon-192x192.png" />
+        <link rel="apple-touch-icon" sizes="152x152" href="/images/icon-152x152.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/images/icon-180x180.png" />
+        <link rel="apple-touch-icon" sizes="167x167" href="/images/icon-167x167.png" />
         <link
           href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
           rel="stylesheet"
