@@ -803,34 +803,35 @@ export function Console() {
       </div>
       <div className="content-main">
         <div className="content-logs">
-          <div className="smart-wallet-gif">
-            <Image
-              src="/images/smart_wallet.gif"
-              alt="Smart Wallet Animation"
-              width={200}
-              height={200}
-              layout="responsive"
-            />
-          </div>
-
           {!isConnected && (
-            <div className="smart-wallet-info">
-              <h2 className="text-sm font-semibold mb-2">TALK2 🗣️ SMART WALLET</h2>
-              <h1 className="text-4xl font-bold mb-4">Your Voice, Your Power</h1>
-              <p className="text-xl mb-6">
-              Control and manage your cryptocurrencies in a smart and fast way.
-              </p>
-            </div>
+            <>
+              <div className="smart-wallet-gif">
+                <Image
+                  src="/images/smart_wallet.gif"
+                  alt="Smart Wallet Animation"
+                  width={200}
+                  height={200}
+                  layout="responsive"
+                />
+              </div>
+
+              <div className="smart-wallet-info">
+                <h2 className="text-sm font-semibold mb-2">TALK2 🗣️ SMART WALLET</h2>
+                <h1 className="text-4xl font-bold mb-4">Your Voice, Your Power</h1>
+                <p className="text-xl mb-6">
+                Control and manage your cryptocurrencies in a smart and fast way.
+                </p>
+              </div>
+            </>
           )}
 
           {isConnected && (
             <div className="content-block waveform">
               <div className="content-block-title">Assistant</div>
-              <div className="content-block-body full">
+              <div className="content-block-body full flex flex-col items-center">
                 <div 
-                  className="last-assistant-message"
+                  className="last-assistant-message w-full"
                   style={{
-                    width: '100%',
                     padding: '12px',
                     backgroundColor: 'rgba(255, 255, 255, 0.1)',
                     borderRadius: '8px',
@@ -850,15 +851,14 @@ export function Console() {
                 >
                   {lastAssistantMessage}
                 </div>
-                <div className="visualization">
+                <div className="visualization w-full flex justify-center">
                   <div className="visualization-entry">
-                    <canvas ref={canvasRef} />
+                    <canvas ref={canvasRef} style={{ maxWidth: '100%', height: 'auto' }} />
                   </div>
                 </div>
                 <div 
-                  className="last-user-message"
+                  className="last-user-message w-full"
                   style={{
-                    width: '100%',
                     padding: '12px',
                     backgroundColor: 'rgba(255, 255, 255, 0.1)',
                     borderRadius: '8px',
@@ -1125,7 +1125,7 @@ export function Console() {
             </div>
           </div>
 
-          <div className="content-block waveform">
+          {/* <div className="content-block waveform">
             <div className="content-block-title">Assistant</div>
             <div className="content-block-body full">
               <div className="last-assistant-message">{lastAssistantMessage}</div>
@@ -1136,7 +1136,7 @@ export function Console() {
               </div>
               <div className="last-user-message">{lastUserMessage}</div>
             </div>
-          </div>
+          </div> */}
           
           <div className="content-block kv" style={{ display: 'none' }}>
             <div className="content-block-title">set_memory()</div>
