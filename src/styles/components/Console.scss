@@ -8,7 +8,7 @@
   flex-direction: column;
   overflow: hidden;
   margin: 0px 8px;
-  background-color: #0A0B0D;
+  background-color: #07090A;
   color: #ffffff;
   & > div {
     flex-shrink: 0;
@@ -81,7 +81,7 @@
         overflow: hidden;
         position: relative;
         .content-block-title {
-          color: #0A0B0D;
+          color: #07090A;
           position: absolute;
           display: flex;
           align-items: center;
@@ -142,11 +142,11 @@
         }
 
         .last-assistant-message {
-          color: #0A0B0D;
+          color: #07090A;
         }
 
         .last-user-message {
-          color: #0A0B0D;
+          color: #07090A;
         }
 
         .visualization {
@@ -299,14 +299,14 @@
       flex-shrink: 0;
       margin-right: 16px;
       &.user {
-        color: #0A0B0D;
+        color: #07090A;
       }
       &.assistant {
-        color: #0A0B0D;
+        color: #07090A;
       }
     }
     .speaker-content {
-      color: #0A0B0D;
+      color: #07090A;
       overflow: hidden;
       word-wrap: break-word;
     }
@@ -329,7 +329,7 @@
     .event-details {
       display: flex;
       flex-direction: column;
-      color: #0A0B0D;
+      color: #07090A;
       gap: 8px;
       .event-summary {
         padding: 4px 8px;

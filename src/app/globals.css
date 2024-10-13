@@ -4,7 +4,7 @@
 
 :root {
   /* Palette */
-  --palette-bg-black: #0A0B0D;
+  --palette-bg-black: #07090A;
   --palette-bg-white: #fff;
 
   /* Indicates that the element can be rendered using 
@@ -31,7 +31,7 @@ body {
   font-weight: 400;
   font-style: normal;
   color: #ffffff;
-  background-color: #0A0B0D;
+  background-color: #07090A;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
