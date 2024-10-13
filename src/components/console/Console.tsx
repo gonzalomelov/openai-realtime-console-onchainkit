@@ -1026,7 +1026,17 @@ export function Console() {
                 disabled={!isConnected || !canPushToTalk}
                 onMouseDown={startRecording}
                 onMouseUp={stopRecording}
-                className={`mb-4 ${isRecording ? 'large-button' : 'large-button-blue'}`}
+                onTouchStart={startRecording}
+                onTouchEnd={stopRecording}
+                className={`mb-4 ${isRecording ? 'large-button' : 'large-button-blue'} select-none touch-none`}
+                style={{
+                  WebkitTouchCallout: 'none',
+                  WebkitUserSelect: 'none',
+                  KhtmlUserSelect: 'none',
+                  MozUserSelect: 'none',
+                  msUserSelect: 'none',
+                  userSelect: 'none',
+                }}
               />
             )}
             <Button
