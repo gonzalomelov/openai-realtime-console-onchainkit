@@ -119,6 +119,9 @@ import { ONCHAINKIT_LINK } from '@/links';
 import TransferUsdcWrapper from '../TransferUsdcWrapper';
 import ApproveUsdcWrapper from '../ApproveUsdcWrapper';
 
+const USDC_CONTRACT_ADDRESS = '0x036cbd53842c5426634e7929541ec2318f3dcf7e';
+const BLOCKSCOUT_URL = 'https://base-sepolia.blockscout.com';
+
 export function Console() {
   const { address } = useAccount();
   const { data: balance } = useBalance({ address });
@@ -129,7 +132,7 @@ export function Console() {
   const [showBalance, setShowBalance] = useState(false);
 
   const { data: usdcBalance } = useReadContract({
-    address: '0x036cbd53842c5426634e7929541ec2318f3dcf7e',
+    address: USDC_CONTRACT_ADDRESS,
     abi: erc20Abi,
     functionName: 'balanceOf',
     args: [address as `0x${string}`],
@@ -737,6 +740,31 @@ export function Console() {
           address: address,
           balance: formattedBalance,
           symbol: 'USDC',
+        };
+      }
+    );
+    client.addTool(
+      {
+        name: 'verify_usdc_balance_on_blockscout',
+        description: 'Opens a new tab with Blockscout to verify the user\'s USDC balance.',
+        parameters: {
+          type: 'object',
+          properties: {},
+          required: [],
+        },
+      },
+      async () => {
+        if (!address) {
+          return { error: 'No wallet connected' };
+        }
+
+        const blockscoutUrl = `${BLOCKSCOUT_URL}/address/${address}?tab=tokens`;
+        
+        // Open the URL in a new tab
+        window.open(blockscoutUrl, '_blank');
+
+        return {
+          message: 'A new tab has been opened to verify your USDC balance on Blockscout.',
         };
       }
     );
