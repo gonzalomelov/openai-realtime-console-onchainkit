@@ -825,62 +825,60 @@ export function Console() {
             </>
           )}
 
-          {isConnected && (
-            <div className="content-block waveform">
-              <div className="content-block-title">Assistant</div>
-              <div className="content-block-body full flex flex-col items-center">
-                <div 
-                  className="last-assistant-message w-full"
-                  style={{
-                    padding: '12px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    borderRadius: '8px',
-                    margin: '12px 0',
-                    maxHeight: '80px',
-                    overflowY: 'auto',
-                    fontSize: '16px',
-                    lineHeight: '1.4',
-                    color: '#ffffff',
-                    textAlign: 'center',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    wordBreak: 'break-word',
-                    boxSizing: 'border-box',
-                  }}
-                >
-                  {lastAssistantMessage}
-                </div>
-                <div className="visualization w-full flex justify-center">
-                  <div className="visualization-entry">
-                    <canvas ref={canvasRef} style={{ maxWidth: '100%', height: 'auto' }} />
-                  </div>
-                </div>
-                <div 
-                  className="last-user-message w-full"
-                  style={{
-                    padding: '12px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    borderRadius: '8px',
-                    margin: '12px 0',
-                    maxHeight: '80px',
-                    overflowY: 'auto',
-                    fontSize: '16px',
-                    lineHeight: '1.4',
-                    color: '#ffffff',
-                    textAlign: 'center',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    wordBreak: 'break-word',
-                    boxSizing: 'border-box',
-                  }}
-                >
-                  {lastUserMessage}
+          <div className={`content-block waveform`} style={{ display: isConnected ? 'block' : 'none' }}>
+            <div className="content-block-title">Assistant</div>
+            <div className="content-block-body full flex flex-col items-center">
+              <div 
+                className="last-assistant-message w-full"
+                style={{
+                  padding: '12px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  borderRadius: '8px',
+                  margin: '12px 0',
+                  maxHeight: '80px',
+                  overflowY: 'auto',
+                  fontSize: '16px',
+                  lineHeight: '1.4',
+                  color: '#ffffff',
+                  textAlign: 'center',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  wordBreak: 'break-word',
+                  boxSizing: 'border-box',
+                }}
+              >
+                {lastAssistantMessage}
+              </div>
+              <div className="visualization w-full flex justify-center">
+                <div className="visualization-entry">
+                  <canvas ref={canvasRef} style={{ maxWidth: '100%', height: 'auto' }} />
                 </div>
               </div>
+              <div 
+                className="last-user-message w-full"
+                style={{
+                  padding: '12px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  borderRadius: '8px',
+                  margin: '12px 0',
+                  maxHeight: '80px',
+                  overflowY: 'auto',
+                  fontSize: '16px',
+                  lineHeight: '1.4',
+                  color: '#ffffff',
+                  textAlign: 'center',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  wordBreak: 'break-word',
+                  boxSizing: 'border-box',
+                }}
+              >
+                {lastUserMessage}
+              </div>
             </div>
-          )}
+          </div>
           
           <div className="content-block events" style={{ display: 'none' }}>
             {/* <div className="visualization">
