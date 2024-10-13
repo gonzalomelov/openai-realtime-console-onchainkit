@@ -812,15 +812,75 @@ export function Console() {
               layout="responsive"
             />
           </div>
-          
-          <div className="smart-wallet-info">
-            <h2 className="text-sm font-semibold">TALK2 🗣️</h2>
-            <h2 className="text-sm font-semibold mb-2">SMART WALLET</h2>
-            <h1 className="text-4xl font-bold mb-4">Your Voice, Your Power</h1>
-            <p className="text-xl mb-6">
-            Control and manage your cryptocurrencies in a smart and fast way.
-            </p>
-          </div>
+
+          {!isConnected && (
+            <div className="smart-wallet-info">
+              <h2 className="text-sm font-semibold mb-2">TALK2 🗣️ SMART WALLET</h2>
+              <h1 className="text-4xl font-bold mb-4">Your Voice, Your Power</h1>
+              <p className="text-xl mb-6">
+              Control and manage your cryptocurrencies in a smart and fast way.
+              </p>
+            </div>
+          )}
+
+          {isConnected && (
+            <div className="content-block waveform">
+              <div className="content-block-title">Assistant</div>
+              <div className="content-block-body full">
+                <div 
+                  className="last-assistant-message"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    borderRadius: '8px',
+                    margin: '12px 0',
+                    maxHeight: '80px',
+                    overflowY: 'auto',
+                    fontSize: '16px',
+                    lineHeight: '1.4',
+                    color: '#ffffff',
+                    textAlign: 'center',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    wordBreak: 'break-word',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  {lastAssistantMessage}
+                </div>
+                <div className="visualization">
+                  <div className="visualization-entry">
+                    <canvas ref={canvasRef} />
+                  </div>
+                </div>
+                <div 
+                  className="last-user-message"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    borderRadius: '8px',
+                    margin: '12px 0',
+                    maxHeight: '80px',
+                    overflowY: 'auto',
+                    fontSize: '16px',
+                    lineHeight: '1.4',
+                    color: '#ffffff',
+                    textAlign: 'center',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    wordBreak: 'break-word',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  {lastUserMessage}
+                </div>
+              </div>
+            </div>
+          )}
           
           <div className="content-block events" style={{ display: 'none' }}>
             {/* <div className="visualization">
@@ -982,7 +1042,7 @@ export function Console() {
             />
           </div>
         </div>
-        <div className="content-right">
+        <div className="content-right" style={{ display: 'none' }}>
           {/*
           <div className="content-block map">
             <div className="content-block-title">get_weather()</div>
