@@ -106,8 +106,8 @@ function useRealtimeClient() {
   return { getClient, isReady: !!client };
 }
 
-import { useAccount, useBalance, useSendTransaction, useDisconnect } from 'wagmi';
-import { parseEther } from 'viem';
+import { useAccount, useBalance, useSendTransaction, useDisconnect, useReadContract } from 'wagmi';
+import { parseEther, parseUnits, formatUnits, erc20Abi } from 'viem';
 import { getAddress } from '@coinbase/onchainkit/identity';
 import { baseSepolia } from 'viem/chains';
 import LoginButton from '../LoginButton';
@@ -127,6 +127,14 @@ export function Console() {
   const { getClient, isReady } = useRealtimeClient();
   const [apiKey, setApiKey] = useState('');
   const [showBalance, setShowBalance] = useState(false);
+
+  const { data: usdcBalance } = useReadContract({
+    address: '0x036cbd53842c5426634e7929541ec2318f3dcf7e',
+    abi: erc20Abi,
+    functionName: 'balanceOf',
+    args: [address as `0x${string}`],
+    chainId: baseSepolia.id,
+  });
 
   /**
    * Instantiate:
@@ -707,6 +715,31 @@ export function Console() {
         return result;
       }
     );
+    client.addTool(
+      {
+        name: 'get_usdc_balance',
+        description: 'Retrieves the current USDC balance of the connected wallet.',
+        parameters: {
+          type: 'object',
+          properties: {},
+          required: [],
+        },
+      },
+      async () => {
+        if (!address) {
+          return { error: 'No wallet connected' };
+        }
+        if (usdcBalance === undefined) {
+          return { error: 'Unable to fetch USDC balance' };
+        }
+        const formattedBalance = formatUnits(usdcBalance, 6); // USDC has 6 decimal places
+        return {
+          address: address,
+          balance: formattedBalance,
+          symbol: 'USDC',
+        };
+      }
+    );
 
     // handle realtime events from client + server for event logging
     client.on('realtime.event', (realtimeEvent: RealtimeEvent) => {
@@ -763,7 +796,7 @@ export function Console() {
       // cleanup; resets to defaults
       client.reset();
     };
-  }, [isReady, getClient, address, balance, connectWallet, disconnectWallet, approveUsdc]);
+  }, [isReady, getClient, address, balance, usdcBalance, connectWallet, disconnectWallet, approveUsdc]);
 
   useEffect(() => {
     const handleFocus = () => {
