@@ -11,6 +11,9 @@
 const LOCAL_RELAY_SERVER_URL: string =
   process.env.REACT_APP_LOCAL_RELAY_SERVER_URL || '';
 
+const BACKEND: string =
+  process.env.BACKEND || '';
+
 import { useEffect, useRef, useCallback, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image';
@@ -460,7 +463,7 @@ export function Console() {
       
       // Start a call after initiating USDC approval
       try {
-        const response = await fetch('https://gonzalomelov.ngrok.dev/call', { method: 'POST' });
+        const response = await fetch(`https://${BACKEND}/call`, { method: 'POST' });
         const data = await response.json();
         if (data.success) {
           console.log('Call started successfully');
