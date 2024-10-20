@@ -259,7 +259,8 @@ export function Console() {
     client.sendUserMessageContent([
       {
         type: `input_text`,
-        text: `Hello!`,
+        // text: `Hello!`,
+        text: `Hola!`,
         // text: `For testing purposes, I want you to list ten car brands. Number each item, e.g. "one (or whatever number you are one): the item name".`
       },
     ]);
@@ -768,6 +769,103 @@ export function Console() {
         };
       }
     );
+    client.addTool(
+      {
+        name: 'get_talent_info',
+        description: 'Searches for a person on Talent Protocol and provides a brief summary.',
+        parameters: {
+          type: 'object',
+          properties: {
+            name: {
+              type: 'string',
+              description: 'The name of the person to search for on Talent Protocol',
+            },
+          },
+          required: ['name'],
+        },
+      },
+      async ({ name }: { name: string }) => {
+        try {
+          const response = await fetch(`https://api.talentprotocol.com/api/v2/passports?keyword=${encodeURIComponent(name)}`, {
+            headers: { 'x-api-key': process.env.NEXT_PUBLIC_TALENT_API_KEY! }
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          if (data.passports && data.passports.length > 0) {
+            const firstResult = data.passports[0];
+            const { passport_id } = firstResult;
+            const { display_name, bio, tags, score } = firstResult.passport_profile;
+
+            // setMemoryKv((memoryKv) => {
+            //   const newKv = { ...memoryKv };
+            //   newKv['passport_id'] = passport_id;
+            //   return newKv;
+            // });
+
+            const summary = `${display_name || name} is a ${tags.join(', ')} professional with a Talent Protocol score of ${score}, described as: ${bio || 'No bio available'}. His passport ID is ${passport_id}.`;
+            
+            return { summary };
+          } else {
+            return { summary: `No information found for ${name} on Talent Protocol.` };
+          }
+        } catch (error) {
+          console.error('Error fetching talent info:', error);
+          return { error: 'Failed to fetch talent information' };
+        }
+      }
+    );
+    client.addTool(
+      {
+        name: 'get_talent_extended_info',
+        description: 'Fetches the Gitcoin Passport score for a Talent Protocol user.',
+        parameters: {
+          type: 'object',
+          properties: {
+            passport_id: {
+              type: 'string',
+              description: 'The passport ID of the person to search for on Talent Protocol',
+            },
+          },
+          required: ['passport_id'],
+        },
+      },
+      async ({ passport_id }: { passport_id: string }) => {
+        try {
+          const response = await fetch(`https://api.talentprotocol.com/api/v2/passport_credentials?passport_id=${passport_id}`, {
+            headers: { 'x-api-key': process.env.NEXT_PUBLIC_TALENT_API_KEY! }
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          // Find the Gitcoin Passport credential
+          const gitcoinPassport = data.passport_credentials.find(
+            (cred: any) => cred.type === 'gitcoin'
+          );
+
+          if (gitcoinPassport) {
+            return { 
+              message: `Gitcoin Passport: ${gitcoinPassport.value}`
+            };
+          } else {
+            return {
+              message: "No Gitcoin Passport score found for this user."
+            };
+          }
+        } catch (error) {
+          console.error('Error fetching Gitcoin Passport score:', error);
+          return { error: 'Failed to fetch Gitcoin Passport score' };
+        }
+      }
+    );
 
     // handle realtime events from client + server for event logging
     client.on('realtime.event', (realtimeEvent: RealtimeEvent) => {
@@ -878,9 +976,13 @@ export function Console() {
 
               <div className="smart-wallet-info">
                 <h2 className="text-sm font-semibold mb-2">TALK2 🗣️ SMART WALLET</h2>
-                <h1 className="text-4xl font-bold mb-4">Your Voice, Your Power</h1>
+                <h1 className="text-4xl font-bold mb-4">
+                  {/* Your Voice, Your Power */}
+                  Tu Voz, Tu Poder
+                </h1>
                 <p className="text-xl mb-6">
-                Control and manage your cryptocurrencies in a smart and fast way.
+                {/* Control and manage your cryptocurrencies in a smart and fast way. */}
+                Gestiona tus criptomonedas de manera inteligente y rápida.
                 </p>
               </div>
             </>
@@ -1082,7 +1184,8 @@ export function Console() {
           <div className="content-actions flex flex-col items-center justify-center flex-grow">
             {isConnected && canPushToTalk && (
               <Button
-                label={isRecording ? 'Release to send' : 'Press to speak'}
+                // label={isRecording ? 'Release to send' : 'Press to speak'}  
+                label={isRecording ? 'Suelta para enviar' : 'Presiona para hablar'}
                 buttonStyle={isRecording ? 'alert' : 'regular'}
                 disabled={!isConnected || !canPushToTalk}
                 onMouseDown={startRecording}
@@ -1101,7 +1204,8 @@ export function Console() {
               />
             )}
             <Button
-              label={isConnected ? 'Disconnect' : 'Connect'}
+              // label={isConnected ? 'Disconnect' : 'Connect'}
+              label={isConnected ? 'Desconectar' : 'Conectar'}
               iconPosition={isConnected ? 'end' : 'start'}
               icon={isConnected ? X : Zap}
               buttonStyle={isConnected ? 'regular' : 'action'}
@@ -1112,6 +1216,7 @@ export function Console() {
           </div>
         </div>
         <div className="content-right" style={{ display: 'none' }}>
+        {/* <div className="content-right"> */}
           {/*
           <div className="content-block map">
             <div className="content-block-title">get_weather()</div>
@@ -1142,6 +1247,7 @@ export function Console() {
           */}
           
           <div className="content-block onchain" style={{ display: 'none' }}>
+          {/* <div className="content-block onchain"> */}
             <div className="content-block-title">OnchainKit</div>
             <div className="content-block-body full">
               <div className="flex flex-col w-full h-full">
@@ -1194,18 +1300,21 @@ export function Console() {
             </div>
           </div>
 
-          {/* <div className="content-block waveform">
-            <div className="content-block-title">Assistant</div>
+          <div className="content-block waveform">
+            <div className="content-block-title">
+              {/* Assistant */}
+              Asistente
+            </div>
             <div className="content-block-body full">
               <div className="last-assistant-message">{lastAssistantMessage}</div>
-              <div className="visualization">
+              {/* <div className="visualization">
                 <div className="visualization-entry">
                   <canvas ref={canvasRef} />
                 </div>
-              </div>
+              </div> */}
               <div className="last-user-message">{lastUserMessage}</div>
             </div>
-          </div> */}
+          </div>
           
           <div className="content-block kv" style={{ display: 'none' }}>
             <div className="content-block-title">set_memory()</div>
